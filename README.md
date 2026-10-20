@@ -170,6 +170,18 @@ dsh plugin --profile <profile> add link:/绝对路径/dsh-ofm-balance
 
 > 本机 profile 名不一定是 `web`，请替换成自己的（例如桌面端常见的是 `desktop`）。
 
+### 预构建安装包（免构建授权）
+
+每个版本都附带一个预构建的安装包，供插件市场直接提供：
+
+```
+https://github.com/Shen-18/dsh-ofm-balance/releases/latest/download/dsh-ofm-balance.tgz
+```
+
+该文件名**不含版本号**，因此 `latest/download/` 在每次发版后仍然有效，不会像
+「资产名带版本号」那样在下一个版本发布时静默 404。从该 tgz 安装时不需要源码构建，
+因此也免去 `allowBuilds` 构建授权这一步。
+
 手动安装：
 
 1. 把本目录加入 profile 的 `package.json` → `dependencies`

@@ -186,6 +186,18 @@ dsh plugin --profile <profile> add link:/absolute/path/to/dsh-ofm-balance
 
 > Your profile may not be called `web`; substitute your own (desktop builds commonly use `desktop`).
 
+### Prebuilt package (skips the build approval)
+
+Every release carries a prebuilt archive so storefronts can offer it directly:
+
+```
+https://github.com/Shen-18/dsh-ofm-balance/releases/latest/download/dsh-ofm-balance.tgz
+```
+
+The asset name carries **no version**, so `latest/download/` keeps working after every release
+instead of silently 404ing the way a versioned filename does once you cut the next one. Installing
+from that tgz needs no source build, which also skips the `allowBuilds` approval step.
+
 Manual install:
 
 1. add this directory to the profile's `package.json` → `dependencies`
