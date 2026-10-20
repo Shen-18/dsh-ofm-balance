@@ -256,14 +256,21 @@ The result: **balances appear on their own after DSH opens**, with no manual ref
 - `gemini`'s quota query needs the machine to reach Google. Without a proxy that channel returns
   `balance: null` with a network-failure note, is shown as "unavailable", and **does not affect other
   channels**; it recovers on the next round once a proxy is available.
-- Some credit bundles the gateway returns **contain** others. The remaining amount follows the
-  gateway's `balance.total` (the account-wide figure), but the **denominator must not** simply sum
-  every bundle's `used`: the same `used` appears in both the aggregate bundle and its children
-  (codearts' 总积分包 and 赠送积分包 both report `used` 349.31), and adding them inflates the
-  denominator. The correct denominator finds the bundle whose `remaining` equals `balance.total`
-  and uses **that bundle's own** `used` as the consumed side (codearts: `7150.69 + 349.31 = 7500`,
-  matching that bundle's `total` field). When no such aggregate exists the bundles are independent
-  and summing them is correct.
+- Two properties of the gateway's credit bundles make the percentage go wrong, both corrected
+  against measured data:
+
+  1. **Overlapping `used`**. The same `used` figure appears in both an aggregate bundle and its
+     children (codearts' 总积分包 and 赠送积分包 both report 349.31), so summing every bundle's
+     `used` inflates the divisor from the true **7500** to 7849.31. The fix identifies the bundle
+     whose `remaining` equals `balance.total` — the aggregate — and uses **that bundle's own**
+     `used`.
+  2. **Lapsed bundles**. The gateway marks expired bundles `active: false` (buddy carries four
+     lapsed 裂变包 at `total` 100 / `used` 100 / `remaining` 0). They are no longer part of the
+     current cycle's allowance, and counting them inflates 4539 to 4939.
+
+  Together these move codearts from 91.1% to the correct **95.3%** and buddy from 78.9% to
+  **85.8%**. When the gateway returns no bundle detail at all, the plugin omits the percentage
+  rather than fabricating a 100%.
 - When no account is signed in for a channel, the balance endpoint **still answers** and simply
   returns an empty account list; the plugin labels it honestly rather than counting it as a failure.
 
@@ -330,13 +337,14 @@ quota.
 
 ## Version
 
-- **0.5.1** — fixed a double-counted denominator in the percentage. The gateway repeats the same
-  `used` figure in both an aggregate bundle and its children (codearts' 总积分包 and 赠送积分包 both
-  report 349.31), so summing them inflates the divisor. The denominator now finds the bundle whose
-  `remaining` equals `balance.total` and uses **that bundle's own** `used`: codearts moves from
-  91.1% (7849.31) to the correct **95.3% (7500)**, matching that bundle's `total` field. Added
-  `lib/gateway.test.js`, pinning the arithmetic and the empty/no-balance fallbacks against real
-  gateway responses.
+- **0.5.1** — fixed two errors in the percentage denominator. (1) The same `used` figure appears in
+  both an aggregate bundle and its children (codearts' 总积分包 and 赠送积分包 both report 349.31),
+  and summing them inflates the divisor; the denominator now finds the bundle whose `remaining`
+  equals `balance.total` and uses **that bundle's own** `used`. (2) Bundles marked `active: false`
+  are expired and no longer part of the cycle's allowance (buddy carries four), and counting them
+  inflated 4539 to 4939. codearts moves from 91.1% to **95.3%** and buddy from 78.9% to **85.8%**.
+  When the gateway returns no bundle detail the percentage is omitted rather than fabricated as
+  100%. Added `lib/gateway.test.js`, pinning these readings against real gateway responses.
 - **0.5.0** — lists **every channel the gateway supports** (rather than only those with a routable
   model), completed by the built-in catalogue; channels with a signed-in account report balances
   normally, those without are labelled honestly. Configured-channel detection gained a file fallback
