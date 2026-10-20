@@ -256,9 +256,14 @@ The result: **balances appear on their own after DSH opens**, with no manual ref
 - `gemini`'s quota query needs the machine to reach Google. Without a proxy that channel returns
   `balance: null` with a network-failure note, is shown as "unavailable", and **does not affect other
   channels**; it recovers on the next round once a proxy is available.
-- Some credit bundles the gateway returns **contain** others (a channel's total package = base +
-  bonus), so the remaining amount follows the gateway's `balance.total` with `total + used` as the
-  denominator, avoiding double counting.
+- Some credit bundles the gateway returns **contain** others. The remaining amount follows the
+  gateway's `balance.total` (the account-wide figure), but the **denominator must not** simply sum
+  every bundle's `used`: the same `used` appears in both the aggregate bundle and its children
+  (codearts' 总积分包 and 赠送积分包 both report `used` 349.31), and adding them inflates the
+  denominator. The correct denominator finds the bundle whose `remaining` equals `balance.total`
+  and uses **that bundle's own** `used` as the consumed side (codearts: `7150.69 + 349.31 = 7500`,
+  matching that bundle's `total` field). When no such aggregate exists the bundles are independent
+  and summing them is correct.
 - When no account is signed in for a channel, the balance endpoint **still answers** and simply
   returns an empty account list; the plugin labels it honestly rather than counting it as a failure.
 
@@ -325,6 +330,13 @@ quota.
 
 ## Version
 
+- **0.5.1** — fixed a double-counted denominator in the percentage. The gateway repeats the same
+  `used` figure in both an aggregate bundle and its children (codearts' 总积分包 and 赠送积分包 both
+  report 349.31), so summing them inflates the divisor. The denominator now finds the bundle whose
+  `remaining` equals `balance.total` and uses **that bundle's own** `used`: codearts moves from
+  91.1% (7849.31) to the correct **95.3% (7500)**, matching that bundle's `total` field. Added
+  `lib/gateway.test.js`, pinning the arithmetic and the empty/no-balance fallbacks against real
+  gateway responses.
 - **0.5.0** — lists **every channel the gateway supports** (rather than only those with a routable
   model), completed by the built-in catalogue; channels with a signed-in account report balances
   normally, those without are labelled honestly. Configured-channel detection gained a file fallback

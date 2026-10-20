@@ -1,6 +1,6 @@
 {
   "name": "dsh-ofm-balance",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "OFM 额度：在 DSH 侧栏显示 Our Free Model 网关各渠道的剩余额度。列出网关支持的全部渠道，已配置的默认显示，可在插件详情页按渠道开关。",
   "icon": "./icon.svg",
   "type": "module",
