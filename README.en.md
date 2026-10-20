@@ -269,8 +269,9 @@ The result: **balances appear on their own after DSH opens**, with no manual ref
      current cycle's allowance, and counting them inflates 4539 to 4939.
 
   Together these move codearts from 91.1% to the correct **95.3%** and buddy from 78.9% to
-  **85.8%**. When the gateway returns no bundle detail at all, the plugin omits the percentage
-  rather than fabricating a 100%.
+  **85.8%**. When the gateway returns no bundle detail at all — or a shape the plugin cannot
+  explain — the percentage is omitted rather than fabricated, because there is no denominator to
+  trust and a made-up 100% would show a mostly-spent balance as never used.
 - When no account is signed in for a channel, the balance endpoint **still answers** and simply
   returns an empty account list; the plugin labels it honestly rather than counting it as a failure.
 
