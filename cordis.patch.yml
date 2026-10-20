@@ -1,0 +1,6 @@
+# dsh-ofm-balance bundle patch: inserts the plugin row into the web roster.
+# One row mounts BOTH halves: the host side (gateway probe, cache, HTTP routes)
+# and the browser side (the sidebar balance card).
+- insert:
+    - id: ofm-balance
+      name: 'dsh-ofm-balance'

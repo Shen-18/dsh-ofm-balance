@@ -1,0 +1,60 @@
+{
+  "name": "dsh-ofm-balance",
+  "version": "0.5.0",
+  "description": "OFM 额度：在 DSH 侧栏显示 Our Free Model 网关各渠道的剩余额度。列出网关支持的全部渠道，已配置的默认显示，可在插件详情页按渠道开关。",
+  "icon": "./icon.svg",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./channels": "./lib/channels.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "docs",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shen-18/dsh-ofm-balance.git"
+  },
+  "homepage": "https://github.com/Shen-18/dsh-ofm-balance#readme",
+  "bugs": {
+    "url": "https://github.com/Shen-18/dsh-ofm-balance/issues"
+  },
+  "scripts": {
+    "test": "node --test lib/*.test.js",
+    "check": "node --check lib/index.js && node --check lib/gateway.js && node --check lib/service.js && node --check lib/channels.js && node --check lib/client.js"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "balance",
+    "usage",
+    "our-free-model"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.1-rc.2"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ],
+      "platform": "web"
+    }
+  }
+}
