@@ -234,6 +234,7 @@ https://github.com/Shen-18/dsh-ofm-balance/releases/latest/download/dsh-ofm-bala
 | `POST` | `/api/dsh-ofm-balance/visibility` | 保存渠道开关，请求体 `{ hidden, revealed }` |
 | `GET` | `/api/dsh-ofm-balance/sources` | 数据源探测结果、当前选择、是否需要询问 |
 | `POST` | `/api/dsh-ofm-balance/sources` | 切换数据源，请求体 `{ source: "plugin" \| "desktop" }` |
+| `POST` | `/api/dsh-ofm-balance/view-session` | 报告侧栏正在显示哪个会话，请求体 `{ sessionId }`；用于让折叠态显示**该会话**的渠道 |
 
 ## 数据来源
 
@@ -364,6 +365,15 @@ npm test        # 单测：渠道分类 + 设置持久化（node --test）
 
 ## 版本
 
+- **0.8.4** — 修复**折叠态显示的是别的会话的渠道**。侧栏卡片是**所有会话共用**的一个元素，而路由记忆只有一个
+  全局值：`session/event` 的回调是 `(session, event)`，会话参数此前被忽略（写作 `_session`）。于是同时开两个
+  会话时，卡片显示的是「**最近发过请求的那个会话**」的渠道，不是用户正在看的那个——实测卡片显示 `buddy`
+  而当前对话在 `codearts`。
+  现在按会话记录：`session/event` 传入的 `session.id` 逐会话保存渠道；客户端从宿主 `sessions` 服务的
+  `retainedBy.mainView` 读出「主视图会话」，经 `POST /view-session` 报告给宿主，折叠态只显示该会话的渠道。
+  该会话尚未发过请求时显示空值，而不是顶替别的会话。客户端拿不到 `sessions` 服务时回退到旧的全局行为，
+  不会变成空白（`sessions` 故意不写进 `inject` —— Cordis 视之为必需依赖，缺了会导致插件不激活）。
+  新增 6 个测试（共 102 个）。
 - **0.8.3** — **插件成为默认主数据源**（`source` 默认值 `auto` → `plugin`）。插件跑在 DSH 里，账号就是在
   DSH 里登录的那些，读它不需要另开进程，因此首次安装不再询问「用哪一套」。插件不在时仍自动回退读桌面
   应用，不会显示空卡片；`auto` 保留为显式选项（想被问的人可以设）。同时修复由此暴露的一个回归：判据写成

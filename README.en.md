@@ -350,6 +350,19 @@ quota.
 
 ## Version
 
+- **0.8.4** — fixed the **collapsed strip showing another session's channel**. The sidebar card is one
+  element **shared by every conversation**, but the route memory was a single global value: the
+  `session/event` callback is `(session, event)` and the session argument was ignored (named
+  `_session`). With two sessions open, the card therefore named the channel of **whichever session had
+  sent a request most recently**, not the one on screen — measured: the strip said `buddy` while the
+  transcript was on `codearts`.
+  Routes are now recorded per session from `session.id`, and the client reads the main-view session
+  (`retainedBy.mainView`) from the shell's `sessions` service and reports it via `POST /view-session`,
+  so the strip only names that session's channel. A viewed session that has not sent a request yet
+  shows nothing rather than another session's channel. A shell without the `sessions` service falls
+  back to the old global behaviour instead of going blank (`sessions` is deliberately not listed in
+  `inject` — Cordis treats those as required dependencies, and a missing one would deactivate the
+  plugin). 6 new tests (102 total).
 - **0.8.3** — **the plugin is now the default source** (`source` default `auto` → `plugin`). The plugin
   runs inside DSH, so its accounts are the ones configured there and reading it needs no separate
   process; a fresh install is therefore no longer asked "which one?". A machine without the plugin
