@@ -11,7 +11,7 @@
 [![简体中文](https://img.shields.io/badge/lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-red.svg)](README.md)
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.en.md)
 
-[![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.1--rc.2-4c6ef5?style=flat-square&labelColor=454a54)](package.json)
+[![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.0--rc.2-4c6ef5?style=flat-square&labelColor=454a54)](package.json)
 [![license](https://img.shields.io/badge/license-MIT-2EA44F?style=flat-square)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/Shen-18/dsh-ofm-balance?style=flat-square&label=%E2%98%85&color=08C)](https://github.com/Shen-18/dsh-ofm-balance)
 [![dependencies](https://img.shields.io/badge/dependencies-0-success?style=flat-square)](package.json)
@@ -356,6 +356,14 @@ npm test        # 单测：渠道分类 + 设置持久化（node --test）
 
 ## 版本
 
+- **0.8.1** — 修复 **DSH 0.2.0 上读不到插件余额**：`connection` 服务里「owner Peer」的字段名在
+  DSH 0.2.1 从 `operator` 改成了 `browserPeer`，而本插件只读新名字，于是在 0.2.0 上恒定抛
+  `connection service has no browser peer`，整个 `plugin` 数据源被判定为不可用，卡片落到
+  `active: none`（「未检测到可用的 Our Free Model」）。现在两个名字都接受，并新增 5 个测试钉住
+  两套内核形状。`engines.dsh` 由 `>=0.2.1-rc.2` 放宽为 `>=0.2.0-rc.2`，与实际支持范围一致。
+  两版内核的 Peer 并不等价：0.2.0 的 `fetch(request)` 只收一个参数、全文没有 `principal`
+  概念，路由**无法**因 Peer 而 403；0.2.1 的 `fetch(request, peer)` 会检查
+  `peer.principal.kind`，因此两者只在「字段名指向同一个 owner 主体」这层意义上是同一个契约。
 - **0.8.0** — 数据源询问改为**只问一次**：关闭提示也算已回答（写入 `sourcePromptSeen`），但「关闭」与「选择」是两种状态——关闭不会钉死某个源，之后仍按 uto 自动选可用的一套；提示里注明后续在「插件详情页 → 数据源」切换。单复数单位合并（credit/credits → credits）；文案去掉「仅可查看」这类废话。
 - **0.7.0** — 渠道显示判据改为**「是否已登录账号」**（`provider.status` → `accounts.total > 0`），不再依据 DSH profile 声明的模型 id。旧判据两头都错：profile 是快照，账号没了还一直声明，卡片堆满读不到数字的行；刚登录的渠道又可能还没写进 profile，真实账号反被隐藏。两套数据源的 provider.status 结构一致，因此一条规则覆盖两边。删除 profile 读取与 60 秒轮询等死代码。
 - **0.6.0** — 支持**两套 Our Free Model 数据源**。此前卡片固定读桌面应用的 `127.0.0.1:18900`；

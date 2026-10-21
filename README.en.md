@@ -11,7 +11,7 @@
 [![简体中文](https://img.shields.io/badge/lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-red.svg)](README.md)
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.en.md)
 
-[![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.1--rc.2-4c6ef5?style=flat-square&labelColor=454a54)](package.json)
+[![DSH](https://img.shields.io/badge/DSH-%3E%3D0.2.0--rc.2-4c6ef5?style=flat-square&labelColor=454a54)](package.json)
 [![license](https://img.shields.io/badge/license-MIT-2EA44F?style=flat-square)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/Shen-18/dsh-ofm-balance?style=flat-square&label=%E2%98%85&color=08C)](https://github.com/Shen-18/dsh-ofm-balance)
 [![dependencies](https://img.shields.io/badge/dependencies-0-success?style=flat-square)](package.json)
@@ -350,6 +350,31 @@ quota.
 
 ## Version
 
+- **0.8.1** — fixed **reading no balances on DSH 0.2.0**: the `connection` service's "owner Peer" field
+  was renamed from `operator` to `browserPeer` in DSH 0.2.1, and this plugin only read the new name.
+  On 0.2.0 it therefore threw `connection service has no browser peer` every time, the whole `plugin`
+  source was judged unreachable, and the card settled on `active: none` ("no usable Our Free Model
+  found"). Both names are now accepted (they are the same owner principal), with 5 new tests pinning
+  both kernel shapes. `engines.dsh` widened from `>=0.2.1-rc.2` to `>=0.2.0-rc.2` to match reality.
+- **0.8.0** — the source question is asked **once**. Dismissing the notice also counts as answered
+  (recorded as `sourcePromptSeen`), but "dismissed" and "chosen" are two different states: dismissing
+  does **not** pin a source, so `auto` keeps falling back to whichever one is live. The notice names
+  where to switch later ("plugin detail page → Data source"). Singular and plural spellings of one
+  unit now fold together (credit/credits → credits), and wording like "view only" was removed.
+- **0.7.0** — channel visibility now keys off **"is an account signed in"** (`provider.status` →
+  `accounts.total > 0`) instead of the model ids the DSH profile declares. The old rule was wrong in
+  both directions: the profile is a stale snapshot that keeps naming channels whose accounts are gone
+  (so the card filled with rows that could never show a number), while a freshly signed-in channel
+  might not be in it yet (so real accounts were hidden). Both products answer `provider.status` with
+  the same shape, so one rule covers both. Removed the profile reader and the 60-second poller.
+- **0.6.0** — supports **two Our Free Model data sources**. Previously the card always read the
+  desktop app at `127.0.0.1:18900`; after installing the official DSH plugin the two account pools
+  turned out to be separate, so the card showed the other one's accounts. It now probes `plugin`
+  (the official plugin, via the DSH kernel's `channel-pack` RPC) and `desktop` (the app, over HTTP),
+  uses the single reachable one directly, asks once only when both are live, and can be switched on
+  the plugin detail page; a choice that becomes unreachable falls back automatically. Both sources
+  share one normalization and denominator-correction path. Added `lib/sources.js`,
+  `lib/plugin-source.js`, and 23 tests (56 total).
 - **0.5.1** — fixed two errors in the percentage denominator. (1) The same `used` figure appears in
   both an aggregate bundle and its children (codearts' 总积分包 and 赠送积分包 both report 349.31),
   and summing them inflates the divisor; the denominator now finds the bundle whose `remaining`
