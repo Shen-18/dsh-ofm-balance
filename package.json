@@ -1,6 +1,6 @@
 {
   "name": "dsh-ofm-balance",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "OFM 额度：在 DSH 侧栏显示 Our Free Model 各渠道的剩余额度。自动识别 DSH 插件与桌面应用两种数据源，按「是否已登录账号」决定显示哪些渠道，可在插件详情页按渠道开关。",
   "icon": "./icon.svg",
   "type": "module",

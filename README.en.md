@@ -350,6 +350,18 @@ quota.
 
 ## Version
 
+- **0.8.3** — **the plugin is now the default source** (`source` default `auto` → `plugin`). The plugin
+  runs inside DSH, so its accounts are the ones configured there and reading it needs no separate
+  process; a fresh install is therefore no longer asked "which one?". A machine without the plugin
+  still falls back to the desktop app rather than showing an empty card, and `auto` remains available
+  for anyone who wants to be asked. This also exposed and fixed a regression: a plain
+  `source !== 'auto'` check meant that once the default became `plugin`, a **saved choice was
+  skipped** — picking the desktop app and restarting silently read the plugin again. Precedence is now
+  "explicit non-default setting → the choice saved by the UI → the plugin default".
+  Cross-source routes no longer light up a channel either: the two products keep separate account
+  pools behind overlapping channel names, so a desktop route while reading the plugin (and the
+  reverse) clears the highlight instead of showing another account's number; switching source clears
+  the remembered route too. 7 new tests (96 total).
 - **0.8.2** — fixed the **collapsed strip naming the wrong channel on the plugin source**. The two
   products announce a route in different shapes: the desktop app reports `provider: ourfreemodel` with
   `model: buddy/deepseek-v4.1-flash` (channel in the model prefix), while the official plugin
