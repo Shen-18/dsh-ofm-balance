@@ -356,6 +356,14 @@ npm test        # 单测：渠道分类 + 设置持久化（node --test）
 
 ## 版本
 
+- **0.8.2** — 修复**折叠态在插件数据源下认错渠道**。两套产品上报路由的形状不同：桌面应用是
+  `provider: ourfreemodel` + `model: buddy/deepseek-v4.1-flash`（渠道在 model 前缀里），而官方
+  插件为每个渠道注册独立的 LLM provider 路由，`provider: workbuddy` + `model:
+  deepseek-v4.1-flash`（model 里没有渠道前缀）。旧代码只按 model 前缀取，在插件模式下取到
+  `deepseek-v4.1-flash`、匹配不到任何行，`currentChannel` 恒为 undefined，折叠态于是回退到
+  「快用完的那个渠道」，与当前对话不符。现在 provider 本身是已知渠道时优先取 provider（仅限
+  `plugin` 源，避免用户自配的同名 provider 点亮渠道行）；插件自有的 `our-free-model` 免费通道
+  明确清空而不沿用上一个渠道；其余仍按 model 前缀取。新增 `lib/route.test.js`（8 个测试）。
 - **0.8.1** — 修复 **DSH 0.2.0 上读不到插件余额**：`connection` 服务里「owner Peer」的字段名在
   DSH 0.2.1 从 `operator` 改成了 `browserPeer`，而本插件只读新名字，于是在 0.2.0 上恒定抛
   `connection service has no browser peer`，整个 `plugin` 数据源被判定为不可用，卡片落到

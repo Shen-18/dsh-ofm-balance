@@ -350,6 +350,17 @@ quota.
 
 ## Version
 
+- **0.8.2** — fixed the **collapsed strip naming the wrong channel on the plugin source**. The two
+  products announce a route in different shapes: the desktop app reports `provider: ourfreemodel` with
+  `model: buddy/deepseek-v4.1-flash` (channel in the model prefix), while the official plugin
+  registers **one LLM provider route per channel** and reports `provider: workbuddy` with `model:
+  deepseek-v4.1-flash` (no channel prefix at all). The old code only read the model prefix, so in
+  plugin mode it produced `deepseek-v4.1-flash`, matched no row, and `currentChannel` stayed
+  undefined — the strip then fell back to "whichever channel is closest to running out" instead of
+  the one being spent. A provider that is itself a known channel now wins (plugin source only, so a
+  user-configured provider of the same name cannot light up a row); the plugin's own `our-free-model`
+  free lane clears the channel rather than leaving the previous one on screen; otherwise the model
+  prefix is still used. Added `lib/route.test.js` (8 tests).
 - **0.8.1** — fixed **reading no balances on DSH 0.2.0**: the `connection` service's "owner Peer" field
   was renamed from `operator` to `browserPeer` in DSH 0.2.1, and this plugin only read the new name.
   On 0.2.0 it therefore threw `connection service has no browser peer` every time, the whole `plugin`
